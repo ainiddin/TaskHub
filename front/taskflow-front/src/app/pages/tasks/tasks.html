@@ -1,0 +1,57 @@
+<div class="tasks-page">
+  <div class="top-bar">
+    <h1>Tasks</h1>
+    <div class="top-actions">
+      <a routerLink="/categories" class="link-btn">Categories</a>
+      <button (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="task-form">
+    <h2>Create Task</h2>
+
+    <input
+      type="text"
+      placeholder="Title"
+      [(ngModel)]="newTask.title"
+      name="title"
+    />
+
+    <textarea
+      placeholder="Description"
+      [(ngModel)]="newTask.description"
+      name="description"
+    ></textarea>
+
+    <select [(ngModel)]="newTask.status" name="status">
+      <option value="not_done">Not done</option>
+      <option value="done">Done</option>
+    </select>
+
+    <input
+      type="date"
+      [(ngModel)]="newTask.due_date"
+      name="due_date"
+    />
+
+    <button (click)="createTask()">Create Task</button>
+  </div>
+
+  <p class="error" *ngIf="error">{{ error }}</p>
+  <p *ngIf="loading">Loading...</p>
+
+  <div class="task-list" *ngIf="!loading">
+    <div class="task-card" *ngFor="let task of tasks">
+      <h3>{{ task.title }}</h3>
+      <p>{{ task.description }}</p>
+      <p>Status: {{ task.status }}</p>
+      <p>Due: {{ task.due_date || 'No date' }}</p>
+
+      <div class="card-actions">
+        <a [routerLink]="['/tasks', task.id]">Details</a>
+        <button (click)="markDone(task)">Done</button>
+        <button class="delete-btn" (click)="deleteTask(task)">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

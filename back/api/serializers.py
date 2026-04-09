@@ -1,7 +1,15 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import Category, Task, Comment, TaskHistory
+from .models import (
+    Workspace,
+    WorkspaceMember,
+    Category,
+    Task,
+    SubTask,
+    Comment,
+    TaskActivity,
+)
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -30,17 +38,45 @@ class LoginSerializer(serializers.Serializer):
         return attrs
 
 
+class WorkspaceSerializer(serializers.ModelSerializer):
+    created_by = serializers.ReadOnlyField(source='created_by.username')
+
+    class Meta:
+        model = Workspace
+        fields = '__all__'
+
+
+class WorkspaceMemberSerializer(serializers.ModelSerializer):
+    user_username = serializers.ReadOnlyField(source='user.username')
+    added_by_username = serializers.ReadOnlyField(source='added_by.username')
+
+    class Meta:
+        model = WorkspaceMember
+        fields = '__all__'
+
+
 class CategorySerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+    created_by = serializers.ReadOnlyField(source='created_by.username')
 
     class Meta:
         model = Category
         fields = '__all__'
 
 
+class SubTaskSerializer(serializers.ModelSerializer):
+    created_by = serializers.ReadOnlyField(source='created_by.username')
+    completed_by = serializers.ReadOnlyField(source='completed_by.username')
+
+    class Meta:
+        model = SubTask
+        fields = '__all__'
+
+
 class TaskSerializer(serializers.ModelSerializer):
-    owner = serializers.ReadOnlyField(source='owner.username')
+    created_by = serializers.ReadOnlyField(source='created_by.username')
+    completed_by = serializers.ReadOnlyField(source='completed_by.username')
     category_name = serializers.ReadOnlyField(source='category.name')
+    subtasks = SubTaskSerializer(many=True, read_only=True)
 
     class Meta:
         model = Task
@@ -55,9 +91,9 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TaskHistorySerializer(serializers.ModelSerializer):
-    changed_by = serializers.ReadOnlyField(source='changed_by.username')
+class TaskActivitySerializer(serializers.ModelSerializer):
+    user_username = serializers.ReadOnlyField(source='user.username')
 
     class Meta:
-        model = TaskHistory
+        model = TaskActivity
         fields = '__all__'

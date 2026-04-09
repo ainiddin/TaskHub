@@ -1,0 +1,76 @@
+.tasks-page {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.top-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.top-actions button,
+.link-btn,
+.task-form button,
+.card-actions button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #01696f;
+  color: white;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.task-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+  margin-bottom: 24px;
+}
+
+.task-form input,
+.task-form textarea,
+.task-form select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.task-list {
+  display: grid;
+  gap: 16px;
+}
+
+.task-card {
+  padding: 16px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: white;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.delete-btn {
+  background: #c0392b !important;
+}
+
+.error {
+  color: #c0392b;
+  margin-bottom: 12px;
+}
