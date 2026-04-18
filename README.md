@@ -1,182 +1,166 @@
-# TaskFlow Backend
+<div align="center">
+  <h1>📋 TaskFlow</h1>
+  <p><b>Your Personal Navigator to Peak Productivity</b></p>
+</div>
 
-Backend part of the **TaskFlow** project built with **Django** and **Django REST Framework**.  
-This API provides authentication, task management, categories, comments, filtering, and CRUD operations. [file:1]
+## Team Members
+
+- Sailaukhan Yenglik
+- Yessirkep Ainiddin
+- Saparkhan Sanzhar
 
 ## Project Description
 
-TaskFlow is a simple task management system where users can:
-- register and log in,
-- create categories,
-- create and manage tasks,
-- filter tasks by category and status,
-- search tasks by title,
-- mark tasks as done or not done,
-- add comments to tasks. [file:1]
+TaskFlow is a full-stack task management system that helps users organize personal and workspace tasks in a simple and structured way.  
+The application allows users to manage daily activities, create subtasks, collaborate inside workspaces, track task progress, and work with recurring tasks for repeated routines.
 
-The backend is implemented according to the course requirements for a Django + DRF project, including models, serializers, FBV, CBV, authentication, CRUD, and CORS support. [file:1]
+## What does the app do?
+
+- User Authentication: users can register, log in, log out, and access their personal profile.
+- Task Management: users can create, edit, delete, and manage personal or workspace tasks.
+- Workspace System: users can create workspaces, join collaborative spaces, and manage workspace members.
+- Task Status Control: tasks can be marked as not done, done, or overdue.
+- Recurring Tasks: users can create daily, weekly, monthly, or custom recurring tasks.
+- Subtasks: users can break large tasks into smaller subtasks and track their completion.
+- Filtering and Search: users can filter tasks by status or priority and search tasks by title or description.
+- Statistics: users can see task statistics for different periods.
+- Activity Tracking: workspace activity is recorded for important actions such as task creation, completion, and member management.
 
 ## Technologies
 
+### Frontend
+- Angular
+- TypeScript
+- HTML
+- CSS
+
+### Backend
 - Python
 - Django
 - Django REST Framework
 - Simple JWT
 - django-cors-headers
-- SQLite [file:1]
+- SQLite
 
 ## Main Features
 
-- JWT authentication: register, login, logout, profile [file:1]
-- Full CRUD for tasks [file:1]
-- CRUD for categories [file:1]
-- Task filtering by category [file:1]
-- Task filtering by status [file:1]
-- Task search by title [file:1]
-- Comments for tasks
-- Objects linked to authenticated user (`request.user`) [file:1]
+- JWT authentication: register, login, logout, profile
+- Full CRUD for tasks
+- Full CRUD for subtasks
+- Workspace creation and deletion
+- Workspace member management
+- Personal tasks and workspace tasks
+- Task filtering by status
+- Task filtering by priority
+- Task search
+- Recurring task logic
+- Activity history
+- User statistics
+- Objects linked to authenticated user
 
-## Models
+## Project Structure
 
-The project contains the following models:
-- `Category`
-- `Task`
-- `Comment`
-- `TaskHistory` [file:1]
+```bash
+TaskFlow/
+│
+├── front/                  # Angular frontend
+│   ├── src/
+│   ├── package.json
+│   └── angular.json
+│
+├── back/                   # Django backend
+│   ├── api/
+│   ├── config/
+│   ├── manage.py
+│   ├── requirements.txt
+│   └── db.sqlite3
+│
+├── .gitignore
+└── README.md
+```
 
-ForeignKey relationships are used between users, categories, tasks, and comments, which satisfies the backend requirements. [file:1]
+## How to Run the Project
 
-## API Endpoints
-
-### Auth
-- `POST /api/register/`
-- `POST /api/login/`
-- `POST /api/logout/`
-- `GET /api/profile/` [file:1]
-
-### Categories
-- `GET /api/categories/`
-- `POST /api/categories/`
-- `GET /api/categories/<id>/`
-- `PUT /api/categories/<id>/`
-- `DELETE /api/categories/<id>/` [file:1]
-
-### Tasks
-- `GET /api/tasks/`
-- `POST /api/tasks/`
-- `GET /api/tasks/<id>/`
-- `PUT /api/tasks/<id>/`
-- `PATCH /api/tasks/<id>/`
-- `DELETE /api/tasks/<id>/` [file:1]
-
-### Comments
-- `GET /api/comments/`
-- `POST /api/comments/` [file:1]
-
-## Task Filters
-
-Examples:
-- `GET /api/tasks/?category=1`
-- `GET /api/tasks/?status=done`
-- `GET /api/tasks/?search=django` [file:1]
-
-## Installation
-
-Clone the repository and open the backend folder:
+### Backend
 
 ```bash
 cd back
-```
-
-Create virtual environment:
-
-```bash
-python -m venv venv
-```
-
-Activate virtual environment:
-
-### Windows PowerShell
-```bash
-venv\Scripts\activate
-```
-
-### Windows CMD
-```bash
-venv\Scripts\activate.bat
-```
-
-Install dependencies:
-
-```bash
-pip install django djangorestframework django-cors-headers djangorestframework-simplejwt
-```
-
-Apply migrations:
-
-```bash
-python manage.py makemigrations
+.\venv\Scripts\activate
+pip install -r requirements.txt
 python manage.py migrate
-```
-
-Create superuser:
-
-```bash
-python manage.py createsuperuser
-```
-
-Run server:
-
-```bash
 python manage.py runserver
 ```
 
-## Authentication
-
-Protected endpoints require JWT access token in headers:
+Backend runs on:
 
 ```bash
-Authorization: Bearer YOUR_ACCESS_TOKEN
+http://127.0.0.1:8000/
 ```
 
-This is needed for authenticated actions such as creating categories and tasks. [file:1]
+### Frontend
 
-## Example Request
+Open a second terminal:
 
-### Login
-```json
-{
-  "username": "testuser",
-  "password": "12345678"
-}
+```bash
+cd front
+npm install
+ng serve
 ```
 
-### Create category
-```json
-{
-  "name": "Study",
-  "color": "blue"
-}
+Frontend runs on:
+
+```bash
+http://localhost:4200/
 ```
 
-### Create task
-```json
-{
-  "title": "Finish Django backend",
-  "description": "Write models and API",
-  "status": "not_done",
-  "priority": "high",
-  "due_date": "2026-04-10",
-  "category": 1
-}
+## API Endpoints
+
+```bash
+POST   /api/register/
+POST   /api/login/
+POST   /api/logout/
+GET    /api/profile/
+
+GET    /api/workspaces/
+POST   /api/workspaces/
+GET    /api/workspaces/<id>/
+PATCH  /api/workspaces/<id>/
+DELETE /api/workspaces/<id>/
+
+GET    /api/workspaces/<workspace_id>/members/
+POST   /api/workspaces/<workspace_id>/members/
+
+GET    /api/tasks/
+POST   /api/tasks/
+GET    /api/tasks/<id>/
+PATCH  /api/tasks/<id>/
+DELETE /api/tasks/<id>/
+
+GET    /api/subtasks/
+POST   /api/subtasks/
+GET    /api/subtasks/<id>/
+PATCH  /api/subtasks/<id>/
+DELETE /api/subtasks/<id>/
+
+GET    /api/activity/
+GET    /api/statistics/
 ```
+
+## Recurring Task Logic
+
+TaskFlow supports recurring tasks.
+
+- If a task is marked as recurring, it can repeat on a daily, weekly, monthly, or custom schedule.
+- When a recurring task is completed, it stays completed until the next occurrence date arrives.
+- After the next cycle starts, the task becomes active again.
 
 ## Notes
 
-- CORS is configured for Angular dev server (`http://localhost:4200`). [file:1]
-- Angular frontend communicates with this backend via HttpClient service, as required by the project description. [file:1]
-- The project is prepared for Postman testing with JWT authentication and CRUD requests. [file:1]
+- `requirements.txt` is needed only for the backend.
+- Frontend dependencies are stored in `package.json`.
+- `node_modules`, `venv`, `.angular`, and `db.sqlite3` should not be pushed to Git.
+- `.gitignore` should be created in the root folder of the project.
 
-## Author
+## Academic Info
 
-Student project for Web Development course, KBTU. [file:1]
+Student project for Web Development, KBTU 2025–2026.
