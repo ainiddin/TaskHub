@@ -1,0 +1,46 @@
+<div class="search-page">
+  <div class="search-bar">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input
+      type="text"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event); onInput()"
+      placeholder="Search tasks..."
+      autofocus
+    />
+    <button class="clear-btn" *ngIf="query()" (click)="query.set(''); results.set([]); searched.set(false)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+
+  <div class="loading" *ngIf="loading()">Searching...</div>
+
+  <div class="empty" *ngIf="searched() && !loading() && results().length === 0">
+    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <p>No tasks found for "{{ query() }}"</p>
+  </div>
+
+  <div class="hint" *ngIf="!searched() && !loading()">
+    <p>Start typing to search your tasks</p>
+  </div>
+
+  <div class="results" *ngIf="!loading() && results().length > 0">
+    <div class="result-count">{{ results().length }} result{{ results().length > 1 ? 's' : '' }}</div>
+
+    <div class="task-item" *ngFor="let task of results()" [class.done]="task.status === 'done'" [class.overdue]="task.status === 'overdue'">
+      <button class="check-btn" (click)="toggleStatus(task)">
+        <svg *ngIf="task.status !== 'done'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+        <svg *ngIf="task.status === 'done'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+      </button>
+      <div class="task-body">
+        <div class="task-title">{{ task.title }}</div>
+        <div class="task-desc" *ngIf="task.description">{{ task.description }}</div>
+        <div class="task-meta">
+          <span class="badge" [class]="'badge-' + task.priority">{{ task.priority }}</span>
+          <span class="due" *ngIf="task.due_date">{{ task.due_date }}</span>
+          <span class="subtasks" *ngIf="task.subtasks?.length">{{ task.subtasks.length }} subtasks</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

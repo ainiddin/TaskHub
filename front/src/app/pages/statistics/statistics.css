@@ -1,0 +1,99 @@
+.stats-page { max-width: 720px; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.page-header h1 { font-size: 24px; font-weight: 700; color: #fff; }
+
+.period-tabs { display: flex; gap: 4px; background: #1a1a24; border-radius: 8px; padding: 4px; }
+.period-tabs button {
+  background: none;
+  border: none;
+  color: #666;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.period-tabs button.active { background: #6c63ff; color: #fff; }
+
+.custom-range {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.custom-range input {
+  background: #1a1a24;
+  border: 1px solid #2a2a3a;
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+.custom-range span { color: #555; }
+.btn-primary { background: #6c63ff; color: #fff; border: none; border-radius: 8px; padding: 8px 16px; font-size: 14px; cursor: pointer; }
+
+.loading { color: #555; font-size: 14px; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: #1a1a24;
+  border: 1px solid #2a2a3a;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+}
+.stat-card.green { border-color: #2d4a2d; }
+.stat-card.red { border-color: #4a2d2d; }
+.stat-card.purple { border-color: #2d1f6e; }
+
+.stat-value { font-size: 32px; font-weight: 700; color: #fff; }
+.stat-card.green .stat-value { color: #6daa45; }
+.stat-card.red .stat-value { color: #ff6b6b; }
+.stat-card.purple .stat-value { color: #a99eff; }
+.stat-label { font-size: 12px; color: #555; margin-top: 4px; }
+
+.completion-block {
+  background: #1a1a24;
+  border: 1px solid #2a2a3a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.completion-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #aaa;
+  margin-bottom: 12px;
+}
+.rate { color: #6c63ff; font-weight: 700; }
+.progress-bar { background: #2a2a3a; border-radius: 99px; height: 8px; }
+.progress-fill { background: #6c63ff; border-radius: 99px; height: 100%; transition: width 0.5s ease; }
+
+.two-stats { display: flex; flex-direction: column; gap: 8px; }
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  background: #1a1a24;
+  border: 1px solid #2a2a3a;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #aaa;
+}
+.val { color: #fff; font-weight: 500; }

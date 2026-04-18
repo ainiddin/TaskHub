@@ -1,0 +1,144 @@
+<div class="tasks-page">
+  <div class="page-header">
+    <h1>{{ getTitle() }}</h1>
+    <button class="btn-add" (click)="openForm()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+      Add Task
+    </button>
+  </div>
+
+  <div class="loading" *ngIf="loading()">Loading...</div>
+
+  <div class="empty" *ngIf="!loading() && tasks().length === 0">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+    <p>No tasks here</p>
+    <button class="btn-add" (click)="openForm()">Create your first task</button>
+  </div>
+
+  <div class="task-list" *ngIf="!loading() && tasks().length > 0">
+    <div class="task-item" *ngFor="let task of tasks()"
+         [class.done]="task.status === 'done'"
+         [class.overdue]="task.status === 'overdue'">
+
+      <button class="check-btn" (click)="toggleStatus(task)">
+        <svg *ngIf="task.status !== 'done'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>
+        <svg *ngIf="task.status === 'done'" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+      </button>
+
+      <div class="task-body" (click)="openForm(task)">
+        <div class="task-title">{{ task.title }}</div>
+        <div class="task-meta">
+          <span class="badge" [class]="'badge-' + task.priority">{{ task.priority }}</span>
+          <span class="due" *ngIf="task.due_date">{{ task.due_date }}</span>
+          <span class="recurring" *ngIf="task.is_recurring">🔁 {{ task.repeat_type }}</span>
+          <span class="subtasks-count" *ngIf="task.subtasks?.length">
+            ✓ {{ doneSubtasks(task) }}/{{ task.subtasks.length }}
+          </span>
+        </div>
+        <div class="subtask-bar" *ngIf="task.subtasks?.length">
+          <div class="subtask-fill" [style.width.%]="(doneSubtasks(task) / task.subtasks.length) * 100"></div>
+        </div>
+      </div>
+
+      <button class="delete-btn" (click)="deleteTask(task.id)">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6l-1 14H6L5 6M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showForm()" (click)="showForm.set(false)">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editingTask() ? 'Edit Task' : 'New Task' }}</h2>
+      <button class="close-btn" (click)="showForm.set(false)">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <div class="field">
+      <label>Title</label>
+      <input type="text"
+             [ngModel]="form().title"
+             (ngModelChange)="updateTitle($event)"
+             placeholder="Task title" />
+    </div>
+
+    <div class="field">
+      <label>Description</label>
+      <textarea
+        [ngModel]="form().description"
+        (ngModelChange)="updateDescription($event)"
+        placeholder="Optional description"
+        rows="2"></textarea>
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label>Priority</label>
+        <select [ngModel]="form().priority" (ngModelChange)="updatePriority($event)">
+          <option value="today">Today</option>
+          <option value="upcoming">Upcoming</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Due date</label>
+        <input type="date"
+               [ngModel]="form().due_date"
+               (ngModelChange)="updateDueDate($event)" />
+      </div>
+    </div>
+
+    <div class="field-row">
+      <div class="field checkbox-field">
+        <input type="checkbox" id="recurring"
+               [ngModel]="form().is_recurring"
+               (ngModelChange)="updateIsRecurring($event)" />
+        <label for="recurring">Recurring</label>
+      </div>
+      <div class="field" *ngIf="form().is_recurring">
+        <label>Repeat</label>
+        <select [ngModel]="form().repeat_type" (ngModelChange)="updateRepeatType($event)">
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="subtasks-section" *ngIf="editingTask()">
+      <div class="subtasks-label">Subtasks</div>
+      <div class="subtask-list">
+        <div class="subtask-row" *ngFor="let sub of editingTask().subtasks">
+          <button class="sub-check" (click)="toggleSubtask(sub)">
+            <svg *ngIf="sub.status !== 'done'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3"/></svg>
+            <svg *ngIf="sub.status === 'done'" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c63ff" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="3" fill="#2d1f6e"/><path d="M7 12l4 4 6-7"/></svg>
+          </button>
+          <span class="sub-title" [class.sub-done]="sub.status === 'done'">{{ sub.title }}</span>
+          <button class="sub-delete" (click)="deleteSubtask(sub.id)">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="subtask-add">
+        <input
+          type="text"
+          [ngModel]="newSubtaskTitle()"
+          (ngModelChange)="newSubtaskTitle.set($event)"
+          placeholder="Add subtask..."
+          (keydown.enter)="addSubtask()" />
+        <button class="btn-sub-add" (click)="addSubtask()">Add</button>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-danger" *ngIf="editingTask()" (click)="deleteTask(editingTask().id)">Delete</button>
+      <div style="flex:1"></div>
+      <button class="btn-secondary" (click)="showForm.set(false)">Cancel</button>
+      <button class="btn-primary" (click)="saveTask()" [disabled]="saving()">
+        {{ saving() ? 'Saving...' : (editingTask() ? 'Save' : 'Create') }}
+      </button>
+    </div>
+  </div>
+</div>

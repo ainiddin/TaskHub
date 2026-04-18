@@ -1,0 +1,64 @@
+<div class="stats-page">
+  <div class="page-header">
+    <h1>Statistics</h1>
+    <div class="period-tabs">
+      <button [class.active]="period() === '3days'" (click)="period.set('3days'); load()">3 Days</button>
+      <button [class.active]="period() === 'week'" (click)="period.set('week'); load()">Week</button>
+      <button [class.active]="period() === 'month'" (click)="period.set('month'); load()">Month</button>
+      <button [class.active]="period() === 'custom'" (click)="period.set('custom')">Custom</button>
+    </div>
+  </div>
+
+  <div class="custom-range" *ngIf="period() === 'custom'">
+    <input type="date" [ngModel]="dateFrom()" (ngModelChange)="dateFrom.set($event)" />
+    <span>—</span>
+    <input type="date" [ngModel]="dateTo()" (ngModelChange)="dateTo.set($event)" />
+    <button class="btn-primary" (click)="load()">Apply</button>
+  </div>
+
+  <div class="loading" *ngIf="loading()">Loading...</div>
+
+  <div class="stats-grid" *ngIf="!loading() && stats()">
+    <div class="stat-card">
+      <div class="stat-value">{{ stats().total_tasks }}</div>
+      <div class="stat-label">Total Tasks</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-value">{{ stats().completed_tasks }}</div>
+      <div class="stat-label">Completed</div>
+    </div>
+    <div class="stat-card red">
+      <div class="stat-value">{{ stats().overdue_tasks }}</div>
+      <div class="stat-label">Overdue</div>
+    </div>
+    <div class="stat-card purple">
+      <div class="stat-value">{{ stats().recurring_tasks }}</div>
+      <div class="stat-label">Recurring</div>
+    </div>
+  </div>
+
+  <div class="completion-block" *ngIf="!loading() && stats()">
+    <div class="completion-header">
+      <span>Completion rate</span>
+      <span class="rate">{{ completionRate }}%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="completionRate"></div>
+    </div>
+  </div>
+
+  <div class="two-stats" *ngIf="!loading() && stats()">
+    <div class="stat-row">
+      <span>Today priority</span>
+      <span class="val">{{ stats().today_tasks }}</span>
+    </div>
+    <div class="stat-row">
+      <span>Upcoming priority</span>
+      <span class="val">{{ stats().upcoming_tasks }}</span>
+    </div>
+    <div class="stat-row">
+      <span>Period</span>
+      <span class="val">{{ stats().date_from }} → {{ stats().date_to }}</span>
+    </div>
+  </div>
+</div>

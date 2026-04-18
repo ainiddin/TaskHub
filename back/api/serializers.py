@@ -1,21 +1,13 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework import serializers
-from .models import (
-    Workspace,
-    WorkspaceMember,
-    Category,
-    Task,
-    SubTask,
-    Comment,
-    TaskActivity,
-)
+from .models import Workspace, WorkspaceMember, Task, SubTask, TaskActivity, UserStats
 
 
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     password = serializers.CharField(write_only=True)
-    email = serializers.EmailField(required=False)
+    email = serializers.EmailField(required=False,allow_blank=True)
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -55,14 +47,6 @@ class WorkspaceMemberSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class CategorySerializer(serializers.ModelSerializer):
-    created_by = serializers.ReadOnlyField(source='created_by.username')
-
-    class Meta:
-        model = Category
-        fields = '__all__'
-
-
 class SubTaskSerializer(serializers.ModelSerializer):
     created_by = serializers.ReadOnlyField(source='created_by.username')
     completed_by = serializers.ReadOnlyField(source='completed_by.username')
@@ -75,19 +59,10 @@ class SubTaskSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     created_by = serializers.ReadOnlyField(source='created_by.username')
     completed_by = serializers.ReadOnlyField(source='completed_by.username')
-    category_name = serializers.ReadOnlyField(source='category.name')
     subtasks = SubTaskSerializer(many=True, read_only=True)
 
     class Meta:
         model = Task
-        fields = '__all__'
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source='author.username')
-
-    class Meta:
-        model = Comment
         fields = '__all__'
 
 
@@ -96,4 +71,10 @@ class TaskActivitySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TaskActivity
+        fields = '__all__'
+
+
+class UserStatsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserStats
         fields = '__all__'

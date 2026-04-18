@@ -1,0 +1,90 @@
+<div class="dashboard">
+
+  <div class="greeting">
+    <h1>{{ getGreeting() }}, {{ auth.currentUser() }} 👋</h1>
+    <p>Here's what's going on with your tasks today.</p>
+  </div>
+
+  <div class="loading" *ngIf="loading()">Loading...</div>
+
+  <div class="stats-grid" *ngIf="!loading() && stats()">
+    <div class="stat-card">
+      <div class="stat-icon total">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats().total_tasks }}</div>
+        <div class="stat-label">Total Tasks</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon done">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value green">{{ stats().completed_tasks }}</div>
+        <div class="stat-label">Completed</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon overdue">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value red">{{ stats().overdue_tasks }}</div>
+        <div class="stat-label">Overdue</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon today">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      </div>
+      <div class="stat-info">
+        <div class="stat-value purple">{{ stats().today_tasks }}</div>
+        <div class="stat-label">Due Today</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="completion-card" *ngIf="!loading() && stats()">
+    <div class="completion-top">
+      <span class="completion-title">Weekly completion rate</span>
+      <span class="completion-rate">{{ completionRate }}%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="completionRate"></div>
+    </div>
+    <div class="completion-sub">{{ stats().completed_tasks }} of {{ stats().total_tasks }} tasks done this week</div>
+  </div>
+
+  <div class="section" *ngIf="recentTasks().length > 0">
+    <div class="section-header">
+      <span class="section-title">Active Tasks</span>
+      <a class="section-link" routerLink="/home/tasks">View all</a>
+    </div>
+    <div class="recent-list">
+      <div class="recent-item" *ngFor="let task of recentTasks()" [class.overdue]="task.status === 'overdue'">
+        <div class="recent-dot" [class]="'dot-' + task.priority"></div>
+        <div class="recent-body">
+          <div class="recent-title">{{ task.title }}</div>
+          <div class="recent-meta">
+            <span class="badge" [class]="'badge-' + task.priority">{{ task.priority }}</span>
+            <span class="due" *ngIf="task.due_date">{{ task.due_date }}</span>
+            <span class="sub-count" *ngIf="task.subtasks?.length">✓ {{ task.subtasks.length }} subtasks</span>
+          </div>
+        </div>
+        <span class="overdue-tag" *ngIf="task.status === 'overdue'">Overdue</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading() && recentTasks().length === 0">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+    <p>No active tasks</p>
+    <a class="btn-add" routerLink="/home/tasks">Create a task</a>
+  </div>
+
+</div>

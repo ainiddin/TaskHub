@@ -1,0 +1,6 @@
+@import '../login/login.css';
+
+.optional {
+  color: #555;
+  font-size: 11px;
+}

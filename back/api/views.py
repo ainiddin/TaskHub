@@ -1,51 +1,34 @@
-from datetime import date
+from datetime import date, timedelta
 from django.contrib.auth.models import User
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.utils import timezone
 
+from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import (
-    Workspace,
-    WorkspaceMember,
-    Category,
-    Task,
-    SubTask,
-    Comment,
-    TaskActivity,
-)
+from .models import Workspace, WorkspaceMember, Task, SubTask, TaskActivity, UserStats
 from .serializers import (
-    RegisterSerializer,
-    LoginSerializer,
-    WorkspaceSerializer,
-    WorkspaceMemberSerializer,
-    CategorySerializer,
-    TaskSerializer,
-    SubTaskSerializer,
-    CommentSerializer,
-    TaskActivitySerializer,
+    RegisterSerializer, LoginSerializer,
+    WorkspaceSerializer, WorkspaceMemberSerializer,
+    TaskSerializer, SubTaskSerializer,
+    TaskActivitySerializer, UserStatsSerializer,
 )
 
 
 def is_workspace_admin(user, workspace):
-    return WorkspaceMember.objects.filter(
-        workspace=workspace,
-        user=user,
-        role__in=['owner', 'admin']
-    ).exists()
+    return WorkspaceMember.objects.filter(workspace=workspace, user=user, role__in=['owner', 'admin']).exists()
 
 
 def is_workspace_member(user, workspace):
-    return WorkspaceMember.objects.filter(
-        workspace=workspace,
-        user=user
-    ).exists()
+    return WorkspaceMember.objects.filter(workspace=workspace, user=user).exists()
 
+
+# ─── AUTH ─────────────────────────────────────────────────────────────────────
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -53,20 +36,12 @@ def register_view(request):
     serializer = RegisterSerializer(data=request.data)
     if serializer.is_valid():
         user = serializer.save()
-
         workspace = Workspace.objects.create(
             name=f"{user.username}'s Workspace",
             description='Personal workspace',
             created_by=user
         )
-
-        WorkspaceMember.objects.create(
-            workspace=workspace,
-            user=user,
-            role='owner',
-            added_by=user
-        )
-
+        WorkspaceMember.objects.create(workspace=workspace, user=user, role='owner', added_by=user)
         return Response({
             'message': 'User created successfully',
             'username': user.username,
@@ -93,249 +68,178 @@ def login_view(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
+    return Response({'message': 'Logout successful'})
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def profile_view(request):
-    workspaces = WorkspaceMember.objects.filter(user=request.user)
     return Response({
         'id': request.user.id,
         'username': request.user.username,
         'email': request.user.email,
-        'workspace_count': workspaces.count()
+        'workspace_count': WorkspaceMember.objects.filter(user=request.user).count()
     })
 
 
-class WorkspaceListAPIView(APIView):
+# ─── WORKSPACE ────────────────────────────────────────────────────────────────
+
+class WorkspaceListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = WorkspaceSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        memberships = WorkspaceMember.objects.filter(user=request.user)
-        workspace_ids = memberships.values_list('workspace_id', flat=True)
-        workspaces = Workspace.objects.filter(id__in=workspace_ids)
-        serializer = WorkspaceSerializer(workspaces, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        workspace_ids = WorkspaceMember.objects.filter(user=self.request.user).values_list('workspace_id', flat=True)
+        return Workspace.objects.filter(id__in=workspace_ids)
+
+    def perform_create(self, serializer):
+        workspace = serializer.save(created_by=self.request.user)
+        WorkspaceMember.objects.create(workspace=workspace, user=self.request.user, role='owner', added_by=self.request.user)
 
 
-class WorkspaceMemberListCreateAPIView(APIView):
+class WorkspaceDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = WorkspaceSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, workspace_id):
+    def get_queryset(self):
+        workspace_ids = WorkspaceMember.objects.filter(user=self.request.user).values_list('workspace_id', flat=True)
+        return Workspace.objects.filter(id__in=workspace_ids)
+
+    def destroy(self, request, *args, **kwargs):
+        workspace = self.get_object()
+        if workspace.created_by != request.user:
+            return Response({'error': 'Only owner can delete workspace'}, status=status.HTTP_403_FORBIDDEN)
+        workspace.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class WorkspaceMemberListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = WorkspaceMemberSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        workspace_id = self.kwargs['workspace_id']
+        return WorkspaceMember.objects.filter(workspace_id=workspace_id)
+
+    def create(self, request, workspace_id):
         try:
             workspace = Workspace.objects.get(pk=workspace_id)
         except Workspace.DoesNotExist:
             return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        if not is_workspace_member(request.user, workspace):
-            return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
-
-        members = WorkspaceMember.objects.filter(workspace=workspace)
-        serializer = WorkspaceMemberSerializer(members, many=True)
-        return Response(serializer.data)
-
-    def post(self, request, workspace_id):
-        try:
-            workspace = Workspace.objects.get(pk=workspace_id)
-        except Workspace.DoesNotExist:
-            return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
-
         if not is_workspace_admin(request.user, workspace):
             return Response({'error': 'Only owner/admin can add members'}, status=status.HTTP_403_FORBIDDEN)
-
         username = request.data.get('username')
         role = request.data.get('role', 'member')
-
         try:
             user_to_add = User.objects.get(username=username)
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
         if WorkspaceMember.objects.filter(workspace=workspace, user=user_to_add).exists():
             return Response({'error': 'User already in workspace'}, status=status.HTTP_400_BAD_REQUEST)
-
-        member = WorkspaceMember.objects.create(
-            workspace=workspace,
-            user=user_to_add,
-            role=role,
-            added_by=request.user
-        )
-
+        member = WorkspaceMember.objects.create(workspace=workspace, user=user_to_add, role=role, added_by=request.user)
         TaskActivity.objects.create(
             workspace=workspace,
             user=request.user,
             action='member_added',
             message=f'{request.user.username} added {user_to_add.username} to workspace'
         )
-
-        serializer = WorkspaceMemberSerializer(member)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(WorkspaceMemberSerializer(member).data, status=status.HTTP_201_CREATED)
 
 
-class CategoryListCreateAPIView(APIView):
+# ─── TASK ─────────────────────────────────────────────────────────────────────
+
+class TaskListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        workspace_id = request.GET.get('workspace')
-        categories = Category.objects.filter(workspace__memberships__user=request.user).distinct()
+    def get_queryset(self):
+        # сбрасываем recurring таски у которых пришло время
+        Task.objects.filter(
+            is_recurring=True,
+            status='done',
+            next_occurrence__lte=date.today()
+        ).update(status='not_done')
 
-        if workspace_id:
-            categories = categories.filter(workspace_id=workspace_id)
+        workspace_id = self.request.GET.get('workspace')
+        if workspace_id is None or workspace_id == '':
+            qs = Task.objects.filter(created_by=self.request.user, workspace__isnull=True)
+        else:
+            qs = Task.objects.filter(
+                workspace_id=workspace_id,
+                workspace__memberships__user=self.request.user
+            ).distinct()
 
-        serializer = CategorySerializer(categories, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        workspace_id = request.data.get('workspace')
-
-        try:
-            workspace = Workspace.objects.get(pk=workspace_id)
-        except Workspace.DoesNotExist:
-            return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        if not is_workspace_member(request.user, workspace):
-            return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
-
-        serializer = CategorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save(created_by=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class CategoryDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get_object(self, pk, user):
-        try:
-            return Category.objects.get(pk=pk, workspace__memberships__user=user)
-        except Category.DoesNotExist:
-            return None
-
-    def get(self, request, pk):
-        category = self.get_object(pk, request.user)
-        if not category:
-            return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = CategorySerializer(category)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        category = self.get_object(pk, request.user)
-        if not category:
-            return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
-        serializer = CategorySerializer(category, data=request.data)
-        if serializer.is_valid():
-            serializer.save(created_by=category.created_by)
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        category = self.get_object(pk, request.user)
-        if not category:
-            return Response({'error': 'Category not found'}, status=status.HTTP_404_NOT_FOUND)
-        category.delete()
-        return Response({'message': 'Category deleted'}, status=status.HTTP_204_NO_CONTENT)
-
-
-class TaskListCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        tasks = Task.objects.filter(workspace__memberships__user=request.user).distinct()
-
-        workspace_id = request.GET.get('workspace')
-        category_id = request.GET.get('category')
-        status_filter = request.GET.get('status')
-        search = request.GET.get('search')
-
-        if workspace_id:
-            tasks = tasks.filter(workspace_id=workspace_id)
-
-        if category_id:
-            tasks = tasks.filter(category_id=category_id)
+        status_filter = self.request.GET.get('status')
+        priority_filter = self.request.GET.get('priority')
+        search = self.request.GET.get('search')
 
         if status_filter:
-            tasks = tasks.filter(status=status_filter)
-
+            qs = qs.filter(status=status_filter)
+        if priority_filter:
+            qs = qs.filter(priority=priority_filter)
         if search:
-            tasks = tasks.filter(
-                Q(title__icontains=search) | Q(description__icontains=search)
-            )
+            qs = qs.filter(Q(title__icontains=search) | Q(description__icontains=search))
+        return qs
 
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        workspace_id = request.data.get('workspace')
-
-        try:
-            workspace = Workspace.objects.get(pk=workspace_id)
-        except Workspace.DoesNotExist:
-            return Response({'error': 'Workspace not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        if not is_workspace_member(request.user, workspace):
-            return Response({'error': 'Access denied'}, status=status.HTTP_403_FORBIDDEN)
-
-        serializer = TaskSerializer(data=request.data)
-        if serializer.is_valid():
-            task = serializer.save(created_by=request.user)
-
+    def perform_create(self, serializer):
+        workspace_id = self.request.data.get('workspace')
+        workspace = None
+        if workspace_id:
+            try:
+                workspace = Workspace.objects.get(pk=workspace_id)
+            except Workspace.DoesNotExist:
+                pass
+        task = serializer.save(created_by=self.request.user)
+        if task.workspace:
             TaskActivity.objects.create(
-                workspace=workspace,
+                workspace=task.workspace,
                 task=task,
-                user=request.user,
+                user=self.request.user,
                 action='task_created',
-                message=f'{request.user.username} created task "{task.title}"'
+                message=f'{self.request.user.username} created task "{task.title}"'
             )
 
-            return Response(TaskSerializer(task).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class TaskDetailAPIView(APIView):
+class TaskDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, pk, user):
-        try:
-            return Task.objects.get(pk=pk, workspace__memberships__user=user)
-        except Task.DoesNotExist:
-            return None
+    def get_queryset(self):
+        return Task.objects.filter(
+            Q(created_by=self.request.user, workspace__isnull=True) |
+            Q(workspace__memberships__user=self.request.user)
+        ).distinct()
 
-    def get(self, request, pk):
-        task = self.get_object(pk, request.user)
-        if not task:
-            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        if task.due_date and task.due_date < date.today() and task.status != 'done':
-            task.status = 'overdue'
-            task.save()
-
-        serializer = TaskSerializer(task)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        task = self.get_object(pk, request.user)
-        if not task:
-            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
-
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
         new_status = request.data.get('status')
 
-        if new_status == 'done' and task.subtasks.filter(status='not_done').exists():
-            return Response(
-                {'error': 'Finish all subtasks before completing the task'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        if new_status == 'done' and instance.subtasks.filter(status='not_done').exists():
+            raise ValidationError('Finish all subtasks before completing the task')
 
-        serializer = TaskSerializer(task, data=request.data)
-        if serializer.is_valid():
-            updated_task = serializer.save(created_by=task.created_by)
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        updated_task = serializer.save()
 
-            if updated_task.status == 'done':
-                updated_task.completed_by = request.user
-                updated_task.completed_at = timezone.now()
-                updated_task.save()
+        if updated_task.due_date and updated_task.due_date < date.today() and updated_task.status != 'done':
+            updated_task.status = 'overdue'
+            updated_task.save()
 
+        if new_status == 'done':
+            updated_task.completed_by = request.user
+            updated_task.completed_at = timezone.now()
+            if updated_task.is_recurring:
+                if updated_task.repeat_type == 'daily':
+                    updated_task.next_occurrence = date.today() + timedelta(days=1)
+                elif updated_task.repeat_type == 'weekly':
+                    updated_task.next_occurrence = date.today() + timedelta(weeks=1)
+                elif updated_task.repeat_type == 'monthly':
+                    updated_task.next_occurrence = date.today() + timedelta(days=30)
+                elif updated_task.repeat_type == 'custom' and updated_task.repeat_every_days:
+                    updated_task.next_occurrence = date.today() + timedelta(days=updated_task.repeat_every_days)
+            updated_task.save()
+            if updated_task.workspace:
                 TaskActivity.objects.create(
                     workspace=updated_task.workspace,
                     task=updated_task,
@@ -344,177 +248,125 @@ class TaskDetailAPIView(APIView):
                     message=f'{request.user.username} completed task "{updated_task.title}"'
                 )
 
-            return Response(TaskSerializer(updated_task).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(self.get_serializer(updated_task).data)
 
-    def patch(self, request, pk):
-        task = self.get_object(pk, request.user)
-        if not task:
-            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        new_status = request.data.get('status')
-
-        if new_status == 'done' and task.subtasks.filter(status='not_done').exists():
-            return Response(
-                {'error': 'Finish all subtasks before completing the task'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        serializer = TaskSerializer(task, data=request.data, partial=True)
-        if serializer.is_valid():
-            updated_task = serializer.save()
-
-            if updated_task.due_date and updated_task.due_date < date.today() and updated_task.status != 'done':
-                updated_task.status = 'overdue'
-                updated_task.save()
-
-            if new_status == 'done':
-                updated_task.completed_by = request.user
-                updated_task.completed_at = timezone.now()
-                updated_task.save()
-
-                TaskActivity.objects.create(
-                    workspace=updated_task.workspace,
-                    task=updated_task,
-                    user=request.user,
-                    action='task_completed',
-                    message=f'{request.user.username} completed task "{updated_task.title}"'
-                )
-
-            return Response(TaskSerializer(updated_task).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        task = self.get_object(pk, request.user)
-        if not task:
-            return Response({'error': 'Task not found'}, status=status.HTTP_404_NOT_FOUND)
-        task.delete()
-        return Response({'message': 'Task deleted'}, status=status.HTTP_204_NO_CONTENT)
+    def perform_update(self, serializer):
+        serializer.save()
 
 
-class SubTaskListCreateAPIView(APIView):
+# ─── SUBTASK ──────────────────────────────────────────────────────────────────
+
+class SubTaskListCreateAPIView(generics.ListCreateAPIView):
+    serializer_class = SubTaskSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        task_id = request.GET.get('task')
-        subtasks = SubTask.objects.filter(task__workspace__memberships__user=request.user).distinct()
-
+    def get_queryset(self):
+        qs = SubTask.objects.filter(
+            Q(task__created_by=self.request.user, task__workspace__isnull=True) |
+            Q(task__workspace__memberships__user=self.request.user)
+        ).distinct()
+        task_id = self.request.GET.get('task')
         if task_id:
-            subtasks = subtasks.filter(task_id=task_id)
+            qs = qs.filter(task_id=task_id)
+        return qs
 
-        serializer = SubTaskSerializer(subtasks, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        task_id = request.data.get('task')
-
-        try:
-            task = Task.objects.get(pk=task_id, workspace__memberships__user=request.user)
-        except Task.DoesNotExist:
-            return Response({'error': 'Task not found or access denied'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = SubTaskSerializer(data=request.data)
-        if serializer.is_valid():
-            subtask = serializer.save(created_by=request.user)
-            return Response(SubTaskSerializer(subtask).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 
-class SubTaskDetailAPIView(APIView):
+class SubTaskDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = SubTaskSerializer
     permission_classes = [IsAuthenticated]
 
-    def get_object(self, pk, user):
-        try:
-            return SubTask.objects.get(pk=pk, task__workspace__memberships__user=user)
-        except SubTask.DoesNotExist:
-            return None
+    def get_queryset(self):
+        return SubTask.objects.filter(
+            Q(task__created_by=self.request.user, task__workspace__isnull=True) |
+            Q(task__workspace__memberships__user=self.request.user)
+        ).distinct()
 
-    def patch(self, request, pk):
-        subtask = self.get_object(pk, request.user)
-        if not subtask:
-            return Response({'error': 'Subtask not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = SubTaskSerializer(subtask, data=request.data, partial=True)
-        if serializer.is_valid():
-            updated_subtask = serializer.save()
-
-            if request.data.get('status') == 'done':
-                updated_subtask.completed_by = request.user
-                updated_subtask.completed_at = timezone.now()
-                updated_subtask.save()
-
+    def perform_update(self, serializer):
+        updated_subtask = serializer.save()
+        if self.request.data.get('status') == 'done':
+            updated_subtask.completed_by = self.request.user
+            updated_subtask.completed_at = timezone.now()
+            updated_subtask.save()
+            if updated_subtask.task.workspace:
                 TaskActivity.objects.create(
                     workspace=updated_subtask.task.workspace,
                     task=updated_subtask.task,
                     subtask=updated_subtask,
-                    user=request.user,
+                    user=self.request.user,
                     action='subtask_completed',
-                    message=f'{request.user.username} completed subtask "{updated_subtask.title}"'
+                    message=f'{self.request.user.username} completed subtask "{updated_subtask.title}"'
                 )
 
-            return Response(SubTaskSerializer(updated_subtask).data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# ─── ACTIVITY ─────────────────────────────────────────────────────────────────
 
-class CommentListCreateAPIView(APIView):
+class ActivityListAPIView(generics.ListAPIView):
+    serializer_class = TaskActivitySerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        task_id = request.GET.get('task')
-        comments = Comment.objects.filter(task__workspace__memberships__user=request.user).distinct()
-
-        if task_id:
-            comments = comments.filter(task_id=task_id)
-
-        serializer = CommentSerializer(comments, many=True)
-        return Response(serializer.data)
-
-    def post(self, request):
-        serializer = CommentSerializer(data=request.data)
-        if serializer.is_valid():
-            comment = serializer.save(author=request.user)
-            return Response(CommentSerializer(comment).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ActivityListAPIView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        workspace_id = request.GET.get('workspace')
-        activities = TaskActivity.objects.filter(workspace__memberships__user=request.user).distinct()
-
+    def get_queryset(self):
+        qs = TaskActivity.objects.filter(workspace__memberships__user=self.request.user).distinct()
+        workspace_id = self.request.GET.get('workspace')
         if workspace_id:
-            activities = activities.filter(workspace_id=workspace_id)
+            qs = qs.filter(workspace_id=workspace_id)
+        return qs.order_by('-created_at')
 
-        serializer = TaskActivitySerializer(activities.order_by('-created_at'), many=True)
-        return Response(serializer.data)
 
+# ─── STATISTICS ───────────────────────────────────────────────────────────────
 
 class StatisticsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        workspace_id = request.GET.get('workspace')
+        period = request.GET.get('period', 'week')
+        date_from_param = request.GET.get('date_from')
+        date_to_param = request.GET.get('date_to')
+        today = date.today()
 
-        tasks = Task.objects.filter(workspace__memberships__user=request.user).distinct()
-        subtasks = SubTask.objects.filter(task__workspace__memberships__user=request.user).distinct()
+        if period == '3days':
+            date_from, date_to = today - timedelta(days=3), today
+        elif period == 'week':
+            date_from, date_to = today - timedelta(weeks=1), today
+        elif period == 'month':
+            date_from, date_to = today - timedelta(days=30), today
+        elif period == 'custom' and date_from_param and date_to_param:
+            date_from = date.fromisoformat(date_from_param)
+            date_to = date.fromisoformat(date_to_param)
+        else:
+            date_from, date_to = today - timedelta(weeks=1), today
 
-        if workspace_id:
-            tasks = tasks.filter(workspace_id=workspace_id)
-            subtasks = subtasks.filter(task__workspace_id=workspace_id)
+        all_tasks = Task.objects.filter(
+            Q(created_by=request.user, workspace__isnull=True) |
+            Q(workspace__memberships__user=request.user)
+        ).distinct()
+
+        period_tasks = all_tasks.filter(created_at__date__gte=date_from, created_at__date__lte=date_to)
 
         data = {
-            'total_tasks': tasks.count(),
-            'done_tasks': tasks.filter(status='done').count(),
-            'not_done_tasks': tasks.filter(status='not_done').count(),
-            'overdue_tasks': tasks.filter(
-                Q(status='overdue') | Q(due_date__lt=date.today(), status='not_done')
-            ).count(),
-            'total_subtasks': subtasks.count(),
-            'done_subtasks': subtasks.filter(status='done').count(),
-            'tasks_by_category': list(
-                tasks.values('category__name').annotate(count=Count('id')).order_by('-count')
-            )
+            'period': period,
+            'date_from': str(date_from),
+            'date_to': str(date_to),
+            'total_tasks': period_tasks.count(),
+            'completed_tasks': period_tasks.filter(status='done').count(),
+            'overdue_tasks': period_tasks.filter(Q(status='overdue') | Q(due_date__lt=today, status='not_done')).count(),
+            'recurring_tasks': period_tasks.filter(is_recurring=True).count(),
+            'today_tasks': all_tasks.filter(priority='today').count(),
+            'upcoming_tasks': all_tasks.filter(priority='upcoming').count(),
         }
+
+        UserStats.objects.create(
+            user=request.user,
+            period=period if period in ['3days', 'week', 'month', 'custom'] else 'week',
+            date_from=date_from,
+            date_to=date_to,
+            total_tasks=data['total_tasks'],
+            completed_tasks=data['completed_tasks'],
+            overdue_tasks=data['overdue_tasks'],
+            recurring_tasks=data['recurring_tasks'],
+            created_tasks=data['total_tasks'],
+        )
+
         return Response(data)

@@ -1,0 +1,35 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <div class="logo">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <rect width="32" height="32" rx="8" fill="#6c63ff"/>
+        <path d="M8 16l6 6 10-12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>TaskFlow</span>
+    </div>
+    <h1>Create account</h1>
+    <p class="subtitle">Start managing your tasks</p>
+
+    <div class="error" *ngIf="error">{{ error }}</div>
+
+    <form (ngSubmit)="submit()">
+      <div class="field">
+        <label>Username</label>
+        <input type="text" [(ngModel)]="username" name="username" placeholder="Choose a username" />
+      </div>
+      <div class="field">
+        <label>Email <span class="optional">(optional)</span></label>
+        <input type="email" [(ngModel)]="email" name="email" placeholder="your@email.com" />
+      </div>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" [(ngModel)]="password" name="password" placeholder="Create a password" />
+      </div>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Creating...' : 'Create account' }}
+      </button>
+    </form>
+
+    <p class="switch">Already have an account? <a routerLink="/login">Sign in</a></p>
+  </div>
+</div>

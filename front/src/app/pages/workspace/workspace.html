@@ -1,0 +1,51 @@
+<div class="workspace-page">
+  <div class="page-header">
+    <h1>Workspace</h1>
+    <div class="tabs">
+      <button [class.active]="tab() === 'tasks'" (click)="tab.set('tasks')">Tasks</button>
+      <button [class.active]="tab() === 'members'" (click)="tab.set('members')">Members</button>
+    </div>
+  </div>
+
+  <div *ngIf="tab() === 'tasks' && workspaceId() > 0">
+    <app-tasks [workspaceIdInput]="workspaceId()" />
+  </div>
+
+  <div *ngIf="tab() === 'members'">
+    <div class="members-header">
+      <span>{{ members().length }} members</span>
+      <button class="btn-add" (click)="showAddMember.set(true)">+ Add Member</button>
+    </div>
+    <div class="member-list">
+      <div class="member-item" *ngFor="let m of members()">
+        <div class="avatar">{{ m.user_username?.charAt(0)?.toUpperCase() }}</div>
+        <div class="member-info">
+          <div class="member-name">{{ m.user_username }}</div>
+          <div class="member-role">{{ m.role }}</div>
+        </div>
+        <span class="role-badge" [class]="'role-' + m.role">{{ m.role }}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="showAddMember()" (click)="showAddMember.set(false)">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h2>Add Member</h2>
+    <div class="field">
+      <label>Username</label>
+      <input type="text" [ngModel]="newMemberUsername()" (ngModelChange)="newMemberUsername.set($event)" placeholder="Enter username" />
+    </div>
+    <div class="field">
+      <label>Role</label>
+      <select [ngModel]="newMemberRole()" (ngModelChange)="newMemberRole.set($event)">
+        <option value="member">Member</option>
+        <option value="admin">Admin</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-secondary" (click)="showAddMember.set(false)">Cancel</button>
+      <button class="btn-primary" (click)="addMember()">Add</button>
+    </div>
+  </div>
+</div>
