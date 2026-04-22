@@ -142,3 +142,20 @@
     </div>
   </div>
 </div>
+<!-- OVERDUE ALERT -->
+<div class="overdue-overlay" *ngIf="showOverdueAlert()" (click)="closeOverdueAlert()">
+  <div class="overdue-modal" (click)="$event.stopPropagation()">
+    <div class="overdue-skull">💀</div>
+    <div class="overdue-title">⚠ ДЕДЛАЙН ПРОШЁЛ ⚠</div>
+    <div class="overdue-subtitle">Следующие задачи просрочены:</div>
+    <div class="overdue-list">
+      <div class="overdue-task-item" *ngFor="let t of overdueAlertTasks()">
+        <span class="overdue-task-name">{{ t.title }}</span>
+        <span class="overdue-task-date">📅 {{ t.due_date }}</span>
+      </div>
+    </div>
+    <button class="overdue-close-btn" (click)="closeOverdueAlert()">
+      Я понял, исправлю!
+    </button>
+  </div>
+</div>

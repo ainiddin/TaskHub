@@ -9,6 +9,7 @@ from .views import (
     ActivityListAPIView,
     StatisticsAPIView,
 )
+from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path('register/', register_view),
@@ -28,4 +29,5 @@ urlpatterns = [
 
     path('activities/', ActivityListAPIView.as_view()),
     path('statistics/', StatisticsAPIView.as_view()),
-]
+
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),]

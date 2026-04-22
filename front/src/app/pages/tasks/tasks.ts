@@ -31,7 +31,8 @@ interface TaskForm {
 })
 export class Tasks implements OnInit, OnChanges {
   @Input() workspaceIdInput: number | null = null;
-
+  overdueAlertTasks = signal<any[]>([]);
+  showOverdueAlert = signal(false);
   tasks = signal<any[]>([]);
   loading = signal(false);
   saving = signal(false);
@@ -90,6 +91,21 @@ export class Tasks implements OnInit, OnChanges {
         if (this.priorityFilter)
           result = result.filter((t: any) => t.priority === this.priorityFilter);
         this.tasks.set([...result]);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const overdue = result.filter((t: any) => {
+          if (t.status === 'done') return false;
+          if (!t.due_date) return false;
+          const due = new Date(t.due_date);
+          due.setHours(0, 0, 0, 0);
+          return due < today;
+        });
+
+        if (overdue.length > 0) {
+          this.overdueAlertTasks.set(overdue);
+          this.showOverdueAlert.set(true);
+        }
         const sel = this.selectedTask();
         if (sel) this.selectedTask.set(data.find((t: any) => t.id === sel.id) || null);
         const editing = this.editingTask();
@@ -103,7 +119,9 @@ export class Tasks implements OnInit, OnChanges {
       },
     });
   }
-
+  closeOverdueAlert() {
+    this.showOverdueAlert.set(false);
+  }
   openForm(task?: any) {
     if (task) {
       this.editingTask.set(task);

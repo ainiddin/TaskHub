@@ -203,3 +203,139 @@
 .btn-danger { background: #2d1a1a; color: #ff6b6b; border: 1px solid #ff4d4d44; border-radius: 8px; padding: 10px 16px; font-size: 14px; cursor: pointer; }
 .btn-danger:hover { background: #ff4d4d22; }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+/* ═══ OVERDUE ALERT ═══ */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-6px); }
+  20%, 40%, 60%, 80% { transform: translateX(6px); }
+}
+
+@keyframes pulse-red {
+  0%, 100% { box-shadow: 0 0 20px #ff000066, 0 0 60px #ff000033; }
+  50% { box-shadow: 0 0 40px #ff0000aa, 0 0 100px #ff000055; }
+}
+
+@keyframes flicker {
+  0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% { opacity: 1; }
+  20%, 24%, 55% { opacity: 0.4; }
+}
+
+.overdue-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(80, 0, 0, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+  backdrop-filter: blur(4px);
+  animation: none;
+}
+
+.overdue-modal {
+  background: #0d0000;
+  border: 2px solid #ff2222;
+  border-radius: 14px;
+  padding: 36px 32px;
+  width: 440px;
+  max-width: 95vw;
+  text-align: center;
+  animation: shake 0.6s ease 0.1s, pulse-red 2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.overdue-modal::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 0, 0, 0.03) 2px,
+    rgba(255, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+.overdue-skull {
+  font-size: 52px;
+  animation: flicker 3s infinite;
+  margin-bottom: 8px;
+}
+
+.overdue-title {
+  font-size: 22px;
+  font-weight: 900;
+  color: #ff2222;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  animation: flicker 2.5s infinite;
+  text-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
+  margin-bottom: 8px;
+}
+
+.overdue-subtitle {
+  font-size: 13px;
+  color: #ff8888;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+}
+
+.overdue-list {
+  background: #1a0000;
+  border: 1px solid #ff222233;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.overdue-task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: #2a0000;
+  border-left: 3px solid #ff2222;
+  border-radius: 4px;
+}
+
+.overdue-task-name {
+  font-size: 14px;
+  color: #ffaaaa;
+  font-weight: 600;
+  text-align: left;
+}
+
+.overdue-task-date {
+  font-size: 12px;
+  color: #ff4444;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.overdue-close-btn {
+  background: #ff2222;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: all 0.2s;
+  text-transform: uppercase;
+}
+
+.overdue-close-btn:hover {
+  background: #cc0000;
+  transform: scale(1.05);
+  box-shadow: 0 0 20px #ff000088;
+}
