@@ -12,6 +12,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Workspace, WorkspaceMember, Task, SubTask, TaskActivity, UserStats
+from .recurrence import calculate_next_occurrence
 from .serializers import (
     RegisterSerializer, LoginSerializer,
     WorkspaceSerializer, WorkspaceMemberSerializer,
@@ -230,14 +231,11 @@ class TaskDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
             updated_task.completed_by = request.user
             updated_task.completed_at = timezone.now()
             if updated_task.is_recurring:
-                if updated_task.repeat_type == 'daily':
-                    updated_task.next_occurrence = date.today() + timedelta(days=1)
-                elif updated_task.repeat_type == 'weekly':
-                    updated_task.next_occurrence = date.today() + timedelta(weeks=1)
-                elif updated_task.repeat_type == 'monthly':
-                    updated_task.next_occurrence = date.today() + timedelta(days=30)
-                elif updated_task.repeat_type == 'custom' and updated_task.repeat_every_days:
-                    updated_task.next_occurrence = date.today() + timedelta(days=updated_task.repeat_every_days)
+                next_occurrence = calculate_next_occurrence(
+                    updated_task.repeat_type, updated_task.repeat_every_days
+                )
+                if next_occurrence is not None:
+                    updated_task.next_occurrence = next_occurrence
             updated_task.save()
             if updated_task.workspace:
                 TaskActivity.objects.create(
