@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -120,6 +120,9 @@ class WorkspaceMemberListCreateAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         workspace_id = self.kwargs['workspace_id']
+        # R-01: only members may see who else is in a workspace
+        if not WorkspaceMember.objects.filter(workspace_id=workspace_id, user=self.request.user).exists():
+            raise PermissionDenied('Only workspace members can view the member list')
         return WorkspaceMember.objects.filter(workspace_id=workspace_id)
 
     def create(self, request, workspace_id):
