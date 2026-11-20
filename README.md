@@ -85,7 +85,8 @@ TaskFlow/
 
 ```bash
 cd back
-.\venv\Scripts\activate
+python -m venv venv
+.\venv\Scripts\activate          # Windows PowerShell. Linux/macOS: source venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
@@ -112,6 +113,16 @@ Frontend runs on:
 ```bash
 http://localhost:4200/
 ```
+
+### Tests
+
+```bash
+cd back && python manage.py test            # backend (Django test runner)
+cd front && npm test -- --watch=false       # frontend (Vitest via Angular CLI)
+```
+
+Note: at the time of the Assignment #05 baseline the frontend suite has 7 failing specs
+(missing `ActivatedRoute` provider in the generated specs). Rules for AI agents are in [AGENTS.md](AGENTS.md).
 
 ## API Endpoints
 
@@ -142,8 +153,9 @@ GET    /api/subtasks/<id>/
 PATCH  /api/subtasks/<id>/
 DELETE /api/subtasks/<id>/
 
-GET    /api/activity/
+GET    /api/activities/
 GET    /api/statistics/
+POST   /api/token/refresh/
 ```
 
 ## Recurring Task Logic
