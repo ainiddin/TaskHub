@@ -1,0 +1,18 @@
+$ node --version / npm --version
+v22.23.5
+10.9.9
+
+$ npm ci
+
+added 471 packages, and audited 472 packages in 15s
+
+110 packages are looking for funding
+  run `npm fund` for details
+
+52 vulnerabilities (2 low, 25 moderate, 22 high, 3 critical)
+
+To address all issues, run:
+  npm audit fix
+
+Run `npm audit` for details.
+exit=0

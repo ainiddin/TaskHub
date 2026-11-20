@@ -1,0 +1,27 @@
+$ pip install -r requirements.txt
+Collecting types-PyYAML==6.0.12.20260408 (from -r requirements.txt (line 11))
+  Downloading types_pyyaml-6.0.12.20260408-py3-none-any.whl.metadata (1.7 kB)
+Collecting typing_extensions==4.15.0 (from -r requirements.txt (line 12))
+  Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
+Collecting tzdata==2026.1 (from -r requirements.txt (line 13))
+  Downloading tzdata-2026.1-py2.py3-none-any.whl.metadata (1.4 kB)
+Downloading asgiref-3.11.1-py3-none-any.whl (24 kB)
+Downloading django-6.0.4-py3-none-any.whl (8.4 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 8.4/8.4 MB 31.2 MB/s  0:00:00
+Downloading django_cors_headers-4.9.0-py3-none-any.whl (12 kB)
+Downloading django_stubs-6.0.3-py3-none-any.whl (541 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 541.6/541.6 kB 26.1 MB/s  0:00:00
+Downloading django_stubs_ext-6.0.3-py3-none-any.whl (10 kB)
+Downloading djangorestframework-3.17.1-py3-none-any.whl (898 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 898.8/898.8 kB 28.5 MB/s  0:00:00
+Downloading djangorestframework_stubs-3.16.9-py3-none-any.whl (57 kB)
+Downloading djangorestframework_simplejwt-5.5.1-py3-none-any.whl (107 kB)
+Downloading pyjwt-2.12.1-py3-none-any.whl (29 kB)
+Downloading sqlparse-0.5.5-py3-none-any.whl (46 kB)
+Downloading types_pyyaml-6.0.12.20260408-py3-none-any.whl (20 kB)
+Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
+Downloading tzdata-2026.1-py2.py3-none-any.whl (348 kB)
+Installing collected packages: tzdata, typing_extensions, types-PyYAML, sqlparse, PyJWT, asgiref, Django, djangorestframework, django-stubs-ext, django-cors-headers, djangorestframework_simplejwt, django-stubs, djangorestframework-stubs
+
+Successfully installed Django-6.0.4 PyJWT-2.12.1 asgiref-3.11.1 django-cors-headers-4.9.0 django-stubs-6.0.3 django-stubs-ext-6.0.3 djangorestframework-3.17.1 djangorestframework-stubs-3.16.9 djangorestframework_simplejwt-5.5.1 sqlparse-0.5.5 types-PyYAML-6.0.12.20260408 typing_extensions-4.15.0 tzdata-2026.1
+exit=0

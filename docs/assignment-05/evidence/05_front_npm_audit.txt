@@ -1,0 +1,35 @@
+$ npm audit --omit=dev
+  Depends on vulnerable versions of @angular/platform-browser
+  node_modules/@angular/forms
+  @angular/platform-browser  21.0.0-next.0 - 21.2.19
+  Depends on vulnerable versions of @angular/common
+  Depends on vulnerable versions of @angular/core
+  node_modules/@angular/platform-browser
+  @angular/router  10.0.0-next.0 - 10.0.0-rc.1 || 21.0.0-next.0 - 21.2.24
+  Depends on vulnerable versions of @angular/common
+  Depends on vulnerable versions of @angular/core
+  Depends on vulnerable versions of @angular/platform-browser
+  node_modules/@angular/router
+
+@angular/compiler  21.0.0-next.0 - 21.2.19
+Severity: high
+@angular/compiler: Two-Way Property Binding Sanitization Bypass (XSS) - https://github.com/advisories/GHSA-58w9-8g37-x9v5
+Angular: Template and Attribute Namespace Sanitization Bypass (XSS) - https://github.com/advisories/GHSA-f3m7-gqxr-g87x
+Angular i18n: Cross-Site Scripting (XSS) via event-handler attributes - https://github.com/advisories/GHSA-jj27-h5hq-8x99
+Angular: Sanitization bypass via directive host bindings on concrete host elements in @angular/core and @angular/compiler - https://github.com/advisories/GHSA-hh8m-fm6v-7cvg
+fix available via `npm audit fix`
+node_modules/@angular/compiler
+  @angular/core  21.0.0-next.0 - 21.2.19
+  Depends on vulnerable versions of @angular/compiler
+  node_modules/@angular/core
+
+
+
+6 vulnerabilities (2 moderate, 4 high)
+
+To address all issues, run:
+  npm audit fix
+exit=1
+
+$ npm audit --omit=dev --json | summary
+{'info': 0, 'low': 0, 'moderate': 2, 'high': 4, 'critical': 0, 'total': 6}

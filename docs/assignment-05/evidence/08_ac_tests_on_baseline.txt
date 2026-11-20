@@ -1,0 +1,40 @@
+$ python manage.py test -v 2   (baseline code + AC tests, before refactoring)
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying api.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+test_anonymous_is_rejected (api.tests.AC1VisibilityTests.test_anonymous_is_rejected) ... ok
+test_other_user_cannot_read_foreign_personal_task_or_subtask (api.tests.AC1VisibilityTests.test_other_user_cannot_read_foreign_personal_task_or_subtask) ... ok
+test_other_user_cannot_read_foreign_workspace_tasks (api.tests.AC1VisibilityTests.test_other_user_cannot_read_foreign_workspace_tasks) ... ok
+test_owner_sees_personal_and_workspace_tasks (api.tests.AC1VisibilityTests.test_owner_sees_personal_and_workspace_tasks) ... ok
+test_can_complete_after_subtasks_done_and_completion_is_recorded (api.tests.AC2CompletionRuleTests.test_can_complete_after_subtasks_done_and_completion_is_recorded) ... ok
+test_cannot_complete_with_open_subtask (api.tests.AC2CompletionRuleTests.test_cannot_complete_with_open_subtask) ... ok
+test_custom_uses_repeat_every_days (api.tests.AC3RecurrenceTests.test_custom_uses_repeat_every_days) ... ok
+test_custom_without_interval_sets_nothing (api.tests.AC3RecurrenceTests.test_custom_without_interval_sets_nothing) ... ok
+test_daily (api.tests.AC3RecurrenceTests.test_daily) ... ok
+test_monthly_is_30_days (api.tests.AC3RecurrenceTests.test_monthly_is_30_days) ... ok
+test_non_recurring_has_no_next_occurrence (api.tests.AC3RecurrenceTests.test_non_recurring_has_no_next_occurrence) ... ok
+test_weekly (api.tests.AC3RecurrenceTests.test_weekly) ... ok
+test_login_with_wrong_password_is_rejected (api.tests.AC4RegistrationAndLoginTests.test_login_with_wrong_password_is_rejected) ... ok
+test_register_creates_user_and_owner_workspace_then_login_works (api.tests.AC4RegistrationAndLoginTests.test_register_creates_user_and_owner_workspace_then_login_works) ... ok
+test_admin_can_add_members (api.tests.AC5WorkspaceRoleTests.test_admin_can_add_members) ... ok
+test_only_creator_can_delete_workspace (api.tests.AC5WorkspaceRoleTests.test_only_creator_can_delete_workspace) ... ok
+test_plain_member_cannot_add_members (api.tests.AC5WorkspaceRoleTests.test_plain_member_cannot_add_members) ... ok
+Ran 17 tests in 6.628s
+OK
+exit=0

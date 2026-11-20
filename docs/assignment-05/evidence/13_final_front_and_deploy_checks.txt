@@ -1,0 +1,29 @@
+$ npm run build   (FINAL, branch assignment-05; front/ untouched)
+                    | Initial total | 259.43 kB |                72.42 kB
+Application bundle generation complete. [3.276 seconds] - 2026-11-20T11:58:43.533Z
+▲ [WARNING] src/app/pages/tasks/tasks.css exceeded maximum budget. Budget 4.00 kB was not met by 2.81 kB with a total of 6.81 kB.
+exit=0
+
+$ npm test -- --watch=false   (FINAL)
+exit=1
+      1 ⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+      1  Test Files  7 failed | 7 passed (14)
+      1  FAIL   front  src/app/pages/workspace/workspace.spec.ts > Workspace > should create
+      1  FAIL   front  src/app/pages/tasks/tasks.spec.ts > Tasks > should create
+      1  FAIL   front  src/app/pages/signup/signup.spec.ts > Signup > should create
+      1  FAIL   front  src/app/pages/login/login.spec.ts > Login > should create
+      1  FAIL   front  src/app/pages/home/home.spec.ts > Home > should create
+      1  FAIL   front  src/app/pages/dashboard/dashboard.spec.ts > Dashboard > should create
+      1  FAIL   front  src/app/app.spec.ts > App > should render title
+      1      Errors  1 error
+      1       Tests  7 failed | 8 passed (15)
+
+$ cd ../back && python manage.py check --deploy  (FINAL)
+System check identified some issues:
+?: (security.W004) You have not set a value for the SECURE_HSTS_SECONDS setting. If your entire site is served
+?: (security.W008) Your SECURE_SSL_REDIRECT setting is not set to True. Unless your site should be available o
+?: (security.W009) Your SECRET_KEY has less than 50 characters, less than 5 unique characters, or it's prefixe
+?: (security.W012) SESSION_COOKIE_SECURE is not set to True. Using a secure-only session cookie makes it more 
+?: (security.W016) You have 'django.middleware.csrf.CsrfViewMiddleware' in your MIDDLEWARE, but you have not s
+?: (security.W018) You should not have DEBUG set to True in deployment.
+System check identified 6 issues (0 silenced).
