@@ -1,0 +1,121 @@
+$ npm run build
+
+> front@0.0.0 build
+> ng build
+
+❯ Building...
+✔ Building...
+Initial chunk files | Names         |  Raw size | Estimated transfer size
+chunk-KGS5HJWJ.js   | -             | 168.91 kB |                48.40 kB
+chunk-FR3IA2PR.js   | -             |  87.47 kB |                22.13 kB
+main-NXBT5WGM.js    | main          |   2.00 kB |               853 bytes
+chunk-75YTZXUX.js   | -             | 958 bytes |               958 bytes
+styles-HXASYZ37.css | styles        |  85 bytes |                85 bytes
+
+                    | Initial total | 259.43 kB |                72.42 kB
+
+Lazy chunk files    | Names         |  Raw size | Estimated transfer size
+chunk-HUTHD3KR.js   | -             |  32.85 kB |                 7.08 kB
+chunk-C3HJIEW7.js   | -             |  24.98 kB |                 5.66 kB
+chunk-GHCGJ5JO.js   | home          |  12.16 kB |                 3.35 kB
+chunk-YPEBWJCP.js   | dashboard     |   9.79 kB |                 2.69 kB
+chunk-XULAJ36N.js   | search        |   7.48 kB |                 2.27 kB
+chunk-2MFWAZB6.js   | workspace     |   7.43 kB |                 2.10 kB
+chunk-JB5XZCNE.js   | statistics    |   6.92 kB |                 1.92 kB
+chunk-KRRPYMAE.js   | signup        |   4.65 kB |                 1.62 kB
+chunk-A5V7CQI6.js   | login         |   4.24 kB |                 1.54 kB
+chunk-JDPRDJTM.js   | -             | 668 bytes |               668 bytes
+chunk-44O32RM3.js   | -             | 667 bytes |               667 bytes
+chunk-HMEO5CWO.js   | -             | 413 bytes |               413 bytes
+chunk-PV4RF2NI.js   | tasks         | 167 bytes |               167 bytes
+
+Application bundle generation complete. [6.359 seconds] - 2026-11-20T11:51:50.462Z
+
+▲ [WARNING] src/app/pages/tasks/tasks.css exceeded maximum budget. Budget 4.00 kB was not met by 2.81 kB with a total of 6.81 kB.
+
+
+Output location: /home/claude/work/taskhub/front/dist/front
+
+exit=0
+
+$ npm test -- --watch=false
+
+ FAIL   front  src/app/pages/login/login.spec.ts > Login > should create
+ɵNotFound: NG0201: No provider found for `ActivatedRoute`. Source: Standalone[_Login]. Find more at https://v21.angular.dev/errors/NG0201
+ ❯ createRuntimeError ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/errors_di.ts:130:16
+ ❯ createRuntimeError ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/null_injector.ts:20:20
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/chained_injector.ts:43:31
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/di.ts:426:63
+ ❯ lookupTokenUsingModuleInjector ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/di.ts:493:9
+ ❯ getOrCreateInjectable ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/di.ts:58:16
+ ❯ NodeInjectorFactory.RouterLink_Factory [as factory] ng:/RouterLink/ɵfac.js:6:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/7]⎯
+
+ FAIL   front  src/app/pages/signup/signup.spec.ts > Signup > should create
+ɵNotFound: NG0201: No provider found for `ActivatedRoute`. Source: Standalone[_Signup]. Find more at https://v21.angular.dev/errors/NG0201
+ ❯ createRuntimeError ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/errors_di.ts:130:16
+ ❯ createRuntimeError ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/null_injector.ts:20:20
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/chained_injector.ts:43:31
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/di.ts:426:63
+ ❯ lookupTokenUsingModuleInjector ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/di.ts:493:9
+ ❯ getOrCreateInjectable ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/di.ts:58:16
+ ❯ NodeInjectorFactory.RouterLink_Factory [as factory] ng:/RouterLink/ɵfac.js:6:7
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/7]⎯
+
+ FAIL   front  src/app/pages/tasks/tasks.spec.ts > Tasks > should create
+ɵNotFound: NG0201: No provider found for `ActivatedRoute`. Source: Standalone[_Tasks]. Find more at https://v21.angular.dev/errors/NG0201
+ ❯ createRuntimeError ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/errors_di.ts:130:16
+ ❯ createRuntimeError ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/null_injector.ts:20:20
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/chained_injector.ts:43:31
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/di.ts:426:63
+ ❯ lookupTokenUsingModuleInjector ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/di.ts:493:9
+ ❯ getOrCreateInjectable ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/di.ts:58:16
+ ❯ NodeInjectorFactory.Tasks_Factory [as factory] src/app/pages/tasks/tasks.ts:32:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/7]⎯
+
+ FAIL   front  src/app/pages/workspace/workspace.spec.ts > Workspace > should create
+ɵNotFound: NG0201: No provider found for `ActivatedRoute`. Source: Standalone[_Workspace]. Find more at https://v21.angular.dev/errors/NG0201
+ ❯ createRuntimeError ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/errors_di.ts:130:16
+ ❯ createRuntimeError ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/null_injector.ts:20:20
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/di/r3_injector.ts:383:26
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/chained_injector.ts:43:31
+ ❯ get ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/di.ts:426:63
+ ❯ lookupTokenUsingModuleInjector ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/di.ts:493:9
+ ❯ getOrCreateInjectable ../darwin_arm64-fastbuild-ST-fdfa778d11ba/bin/packages/core/src/render3/instructions/di.ts:58:16
+ ❯ NodeInjectorFactory.Workspace_Factory [as factory] src/app/pages/workspace/workspace.ts:16:23
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/7]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+HttpErrorResponse: Http failure response for http://127.0.0.1:8000/api/tasks/?workspace=: 0 Unknown Error
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+This error originated in "src/app/pages/dashboard/dashboard.spec.ts" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+
+ Test Files  7 failed | 7 passed (14)
+      Tests  7 failed | 8 passed (15)
+     Errors  1 error
+   Start at  16:51:54
+   Duration  3.40s (transform 315ms, setup 259ms, import 405ms, tests 395ms, environment 387ms)
+
+exit=1

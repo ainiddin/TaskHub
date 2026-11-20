@@ -1,0 +1,24 @@
+$ python manage.py test probe_baseline   (baseline commit 5954516, scratch probe file, not part of repo)
+PROBE H1 | bob (non-member) GET members of Alice WS -> HTTP 200, rows=2
+PROBE H2 | bob POST task into Alice WS -> HTTP 201; stored workspace_id=1; new activity rows in Alice WS=1
+PROBE H3 | bob POST subtask onto Alice task -> HTTP 201; then Alice PATCH task status=done -> HTTP 400 ['Finish all subtasks before completing the task']
+PROBE H4 | register same username twice -> HTTP 201 then HTTP 500
+PROBE H5 | register with password "1" -> HTTP 201
+PROBE H6 | statistics custom with invalid dates -> HTTP 500
+PROBE H7 | 3 x GET /api/statistics/ -> UserStats rows for alice: 0 -> 3
+PROBE H8 | logout -> HTTP 200; refresh with the same refresh token afterwards -> HTTP 200
+PROBE H9 | carol (role=member) PATCH workspace name -> HTTP 200; name now "renamed by carol"
+PROBE H10b | admin dave adds eve with role="owner" -> HTTP 201; stored role=owner
+PROBE H10 | owner adds bob with role="superuser-xyz" -> HTTP 201; stored role=superuser-xyz
+PROBE H11 | alice PATCH her personal task workspace=<Bob WS she is not in> -> HTTP 200; task.workspace_id now 2 (Bob WS id=2)
+PROBE H12 | bob GET /api/tasks/ -> Alice recurring task status now "not_done" (was "done")
+PROBE H13 | 20 wrong-password logins -> status codes set [400]
+PROBE H14 | monthly task completed -> next_occurrence - today = 30 days
+PROBE H15 | bob GET alice personal task by id -> HTTP 404
+PROBE H16 | bob GET alice subtask by id -> HTTP 404
+PROBE H17 | bob GET /api/tasks/?search=' OR 1=1 -- -> HTTP 200, rows returned=0
+PROBE H18 | ACCESS_TOKEN_LIFETIME=0:05:00, REFRESH_TOKEN_LIFETIME=1 day, 0:00:00
+PROBE H19 | bob GET /api/activities/ -> HTTP 200, rows=0
+PROBE H20 | anonymous GET /api/tasks/ -> HTTP 401
+Ran 19 tests in 16.010s
+OK

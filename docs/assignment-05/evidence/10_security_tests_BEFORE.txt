@@ -1,0 +1,18 @@
+$ python manage.py test api.test_security -v 2   (BEFORE mitigations: tests written first, code unchanged)
+test_cannot_move_task_into_foreign_workspace (api.test_security.R01AuthorizationTests.test_cannot_move_task_into_foreign_workspace) ... FAIL
+test_member_can_add_subtask_to_workspace_task (api.test_security.R01AuthorizationTests.test_member_can_add_subtask_to_workspace_task) ... ok
+test_member_can_create_task_in_own_workspace (api.test_security.R01AuthorizationTests.test_member_can_create_task_in_own_workspace) ... ok
+test_member_can_list_workspace_members (api.test_security.R01AuthorizationTests.test_member_can_list_workspace_members) ... ok
+test_non_member_cannot_add_subtask_to_foreign_task (api.test_security.R01AuthorizationTests.test_non_member_cannot_add_subtask_to_foreign_task) ... FAIL
+test_non_member_cannot_create_task_in_foreign_workspace (api.test_security.R01AuthorizationTests.test_non_member_cannot_create_task_in_foreign_workspace) ... FAIL
+test_non_member_cannot_list_workspace_members (api.test_security.R01AuthorizationTests.test_non_member_cannot_list_workspace_members) ... FAIL
+test_owner_can_add_subtask_to_own_personal_task (api.test_security.R01AuthorizationTests.test_owner_can_add_subtask_to_own_personal_task) ... ok
+test_personal_task_without_workspace_still_works (api.test_security.R01AuthorizationTests.test_personal_task_without_workspace_still_works) ... ok
+test_user_cannot_add_subtask_to_someone_elses_personal_task (api.test_security.R01AuthorizationTests.test_user_cannot_add_subtask_to_someone_elses_personal_task) ... FAIL
+test_common_password_is_rejected (api.test_security.R03RegistrationTests.test_common_password_is_rejected) ... FAIL
+test_duplicate_username_returns_400_not_500 (api.test_security.R03RegistrationTests.test_duplicate_username_returns_400_not_500) ... FAIL
+test_strong_password_still_registers (api.test_security.R03RegistrationTests.test_strong_password_still_registers) ... ok
+test_too_short_password_is_rejected (api.test_security.R03RegistrationTests.test_too_short_password_is_rejected) ... FAIL
+Ran 14 tests in 4.823s
+FAILED (failures=8)
+exit(from first run)=1 if FAILED present

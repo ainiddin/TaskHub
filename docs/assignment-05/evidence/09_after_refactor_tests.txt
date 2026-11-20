@@ -1,0 +1,31 @@
+$ python manage.py test   (after refactoring: AC tests + recurrence unit tests)
+test_anonymous_is_rejected (api.tests.AC1VisibilityTests.test_anonymous_is_rejected) ... ok
+test_other_user_cannot_read_foreign_personal_task_or_subtask (api.tests.AC1VisibilityTests.test_other_user_cannot_read_foreign_personal_task_or_subtask) ... ok
+test_other_user_cannot_read_foreign_workspace_tasks (api.tests.AC1VisibilityTests.test_other_user_cannot_read_foreign_workspace_tasks) ... ok
+test_owner_sees_personal_and_workspace_tasks (api.tests.AC1VisibilityTests.test_owner_sees_personal_and_workspace_tasks) ... ok
+test_can_complete_after_subtasks_done_and_completion_is_recorded (api.tests.AC2CompletionRuleTests.test_can_complete_after_subtasks_done_and_completion_is_recorded) ... ok
+test_cannot_complete_with_open_subtask (api.tests.AC2CompletionRuleTests.test_cannot_complete_with_open_subtask) ... ok
+test_custom_uses_repeat_every_days (api.tests.AC3RecurrenceTests.test_custom_uses_repeat_every_days) ... ok
+test_custom_without_interval_sets_nothing (api.tests.AC3RecurrenceTests.test_custom_without_interval_sets_nothing) ... ok
+test_daily (api.tests.AC3RecurrenceTests.test_daily) ... ok
+test_monthly_is_30_days (api.tests.AC3RecurrenceTests.test_monthly_is_30_days) ... ok
+test_non_recurring_has_no_next_occurrence (api.tests.AC3RecurrenceTests.test_non_recurring_has_no_next_occurrence) ... ok
+test_weekly (api.tests.AC3RecurrenceTests.test_weekly) ... ok
+test_login_with_wrong_password_is_rejected (api.tests.AC4RegistrationAndLoginTests.test_login_with_wrong_password_is_rejected) ... ok
+test_register_creates_user_and_owner_workspace_then_login_works (api.tests.AC4RegistrationAndLoginTests.test_register_creates_user_and_owner_workspace_then_login_works) ... ok
+test_admin_can_add_members (api.tests.AC5WorkspaceRoleTests.test_admin_can_add_members) ... ok
+test_only_creator_can_delete_workspace (api.tests.AC5WorkspaceRoleTests.test_only_creator_can_delete_workspace) ... ok
+test_plain_member_cannot_add_members (api.tests.AC5WorkspaceRoleTests.test_plain_member_cannot_add_members) ... ok
+test_custom_uses_interval (api.test_recurrence.CalculateNextOccurrenceTests.test_custom_uses_interval) ... ok
+test_custom_without_interval_returns_none (api.test_recurrence.CalculateNextOccurrenceTests.test_custom_without_interval_returns_none) ... ok
+test_daily (api.test_recurrence.CalculateNextOccurrenceTests.test_daily) ... ok
+test_monthly_is_thirty_days_not_calendar_month (api.test_recurrence.CalculateNextOccurrenceTests.test_monthly_is_thirty_days_not_calendar_month) ... ok
+test_unknown_or_missing_type_returns_none (api.test_recurrence.CalculateNextOccurrenceTests.test_unknown_or_missing_type_returns_none) ... ok
+test_weekly (api.test_recurrence.CalculateNextOccurrenceTests.test_weekly) ... ok
+Ran 23 tests in 6.237s
+OK
+exit=0
+
+$ python manage.py check; makemigrations --check --dry-run
+System check identified no issues (0 silenced).
+No changes detected
